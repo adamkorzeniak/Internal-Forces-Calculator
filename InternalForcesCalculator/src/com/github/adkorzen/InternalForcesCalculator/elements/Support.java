@@ -28,4 +28,18 @@ public enum Support {
 	public boolean isRotationBlocked() {
 		return rotationBlocked;
 	}
+	
+	public int getAmountOfBonds() {
+		int result = 0;
+		if (xMoveBlocked) {
+			result ++;
+		}
+		if (yMoveBlocked) {
+			result ++;
+		}
+		if (rotationBlocked && result > 0) {
+			result ++;
+		}
+		return result;
+	}
 }
