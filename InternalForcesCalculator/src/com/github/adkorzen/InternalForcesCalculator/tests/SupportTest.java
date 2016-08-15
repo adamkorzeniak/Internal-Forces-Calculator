@@ -107,5 +107,4 @@ public class SupportTest {
 		
 		assertEquals(expected, actual);
 	}
-
 }

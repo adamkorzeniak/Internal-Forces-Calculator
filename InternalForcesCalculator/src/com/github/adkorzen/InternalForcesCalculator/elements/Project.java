@@ -12,35 +12,137 @@ public class Project {
 	private List<Bar> bars = new ArrayList<Bar>();
 	private List<Disk> disks = new ArrayList<Disk>();
 
-	public Project(String name) {
-		this.name = name;
-	}
-
-	///// to test and to change
-	public void createDisks() {
+	private void createDisks() {
 		addFoundationDisk();
+		List<Bar> assigned = new ArrayList<Bar>();
+		for (Bar b : bars) {
+			if (!assigned.contains(b)) {
+				Disk disk = new Disk(b);
+				disks.add(disk);
+				assigned.add(b);
+
+				if (!b.isStartingNodeReleased()) {
+					Node check = b.getStartingNode();
+					for (Bar other : bars) {
+						if (!assigned.contains(other)) {
+
+							Node first = other.getStartingNode();
+							Node second = other.getStartingNode();
+
+							if (first.equals(check) && !other.isStartingNodeReleased()) {
+								assigned.add(other);
+								disk.addBar(other);
+								if (!other.isEndingNodeReleased()) {
+									Node toCheck = second;
+
+									checkBarConnection(disk, assigned, toCheck);
+
+								}
+							} else if (second.equals(check) && !other.isEndingNodeReleased()) {
+								assigned.add(other);
+								disk.addBar(other);
+								if (!other.isStartingNodeReleased()) {
+									Node toCheck = first;
+
+									checkBarConnection(disk, assigned, toCheck);
+
+								}
+							}
+						}
+					}
+				}
+				if (!b.isEndingNodeReleased()) {
+					Node check = b.getEndingNode();
+					for (Bar other : bars) {
+						if (!assigned.contains(other)) {
+
+							Node first = other.getStartingNode();
+							Node second = other.getStartingNode();
+
+							if (first.equals(check) && !other.isStartingNodeReleased()) {
+								assigned.add(other);
+								disk.addBar(other);
+								if (!other.isEndingNodeReleased()) {
+									Node toCheck = second;
+
+									checkBarConnection(disk, assigned, toCheck);
+
+								}
+							} else if (second.equals(check) && !other.isEndingNodeReleased()) {
+								assigned.add(other);
+								disk.addBar(other);
+								if (!other.isStartingNodeReleased()) {
+									Node toCheck = first;
+
+									checkBarConnection(disk, assigned, toCheck);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	private void checkBarConnection(Disk disk, List<Bar> assigned, Node check) {
+		for (Bar other : bars) {
+			if (!assigned.contains(other)) {
+
+				Node first = other.getStartingNode();
+				Node second = other.getStartingNode();
+
+				if (first.equals(check) && !other.isStartingNodeReleased()) {
+					assigned.add(other);
+					disk.addBar(other);
+					if (!other.isEndingNodeReleased()) {
+						Node toCheck = second;
+
+						checkBarConnection(disk, assigned, toCheck);
+
+					}
+				} else if (second.equals(check) && !other.isEndingNodeReleased()) {
+					assigned.add(other);
+					disk.addBar(other);
+					if (!other.isStartingNodeReleased()) {
+						Node toCheck = first;
+
+						checkBarConnection(disk, assigned, toCheck);
+					}
+				}
+			}
+		}
 	}
 
-	/// to change without testing (test above method)
 	private void addFoundationDisk() {
-		disks.add(new Disk(this));
-	}
-
-	public String getName() {
-		return name;
+		disks.add(new Disk());
 	}
 
 	public void addNode(double x, double y) {
 		Node node = new Node(this, x, y);
-		nodes.add(node);
+		if (!nodes.contains(node)) {
+			nodes.add(node);
+		}
 	}
 
 	public void removeNode(Node node) {
+		for (Bar b : bars) {
+			if (b.getStartingNode().equals(node) || b.getEndingNode().equals(node)) {
+				System.out.println(
+						"You can't remove node if there are existing bars containing that node. Remove that bars first");
+				return;
+			}
+		}
 		nodes.remove(node);
 	}
 
-	public List<Node> getNodesList() {
-		return nodes;
+	public Node getNode(double x, double y) {
+		Node compare = new Node(this, x, y);
+		for (Node el : nodes) {
+			if (el.equals(compare)) {
+				return el;
+			}
+		}
+		return null;
 	}
 
 	public void addSupport(Node support) {
@@ -54,29 +156,35 @@ public class Project {
 			supports.remove(support);
 		}
 	}
-	
-	public List<Node> getSupportsList() {
-		return supports;
+
+	public Node getSupport(double x, double y) {
+		Node compare = new Node(this, x, y);
+		for (Node el : supports) {
+			if (el.equals(compare)) {
+				return el;
+			}
+		}
+		return null;
 	}
-	
+
 	// to test and to implement
 	public List<Bar> selectBars(int x1, int y1, int x2, int y2) {
 		return null;
 	}
-	
+
 	public List<Node> selectNodes(int x1, int y1, int x2, int y2) {
 		return null;
 	}
-	
+
 	public List<Element> selectElements(int x1, int y1, int x2, int y2) {
 		return null;
 	}
-	
+
 	public Element selectElement(int x, int y) {
 		return null;
 	}
 
-	///toTest
+	/// toTest
 	public void addBar(double xStart, double yStart, double xEnd, double yEnd) {
 		Node start = null;
 		Node end = null;
@@ -97,25 +205,14 @@ public class Project {
 		}
 
 		Bar bar = new Bar(this, start, end);
-		bars.add(bar);
-	}
-	public List<Bar> getBarsList() {
-		return bars;
-	}
-	
-	public Node getNode(double x, double y) {
-		Node compare = new Node(this, x, y);
-		for (Node el: nodes) {
-			if (el.equals(compare)) {
-				return el;
-			}
+		if (!bars.contains(bar)) {
+			bars.add(bar);
 		}
-		return null;
 	}
-	
+
 	public Bar getBar(double x, double y) {
 		Point p = new Point(x, y);
-		for (Bar el: bars) {
+		for (Bar el : bars) {
 			if (el.contains(p)) {
 				return el;
 			}
@@ -127,40 +224,52 @@ public class Project {
 		bars.remove(bar);
 	}
 
-	public void addDisk(Disk disk) {
-		disks.add(disk);
-	}
+	// public void addDisk(Disk disk) {
+	// disks.add(disk);
+	// }
+	//
+	// public void removeDisk(Disk disk) {
+	// disks.remove(disk);
+	// }
 
-	public void removeDisk(Disk disk) {
-		disks.remove(disk);
-	}
+	public boolean areNodesStable() {
+		int barCount = 0;
+		int releaseCount = 0;
+		for (Node n : nodes) {
+			barCount = 0;
+			releaseCount = 0;
+			for (Bar b : bars) {
+				if (b.contains(n)) {
+					barCount++;
+					if (b.getStartingNode().equals(n) && b.isStartingNodeReleased()) {
+						releaseCount++;
+					} else if (b.getEndingNode().equals(n) && b.isEndingNodeReleased()) {
+						releaseCount++;
+					}
+				}
+			}
 
-	public boolean contains(Disk disk) {
-		return disks.contains(disk);
-	}
-
-	public boolean contains(Bar bar) {
-		return bars.contains(bar);
-	}
-
-	public boolean contains(Node node) {
-		return nodes.contains(node);
-	}
-	
-	public boolean containsSupport(Node support) {
-		return supports.contains(support);
+			if (releaseCount == barCount) {
+				return false;
+			} else if (releaseCount > barCount) {
+				System.out.println("Programming error");
+				return false;
+			}
+		}
+		return true;
 	}
 
 	public boolean isStaticallySolvable() {
+		createDisks();
 		int bonds = 0;
 		for (Node support : supports) {
 			bonds += support.getSupport().getAmountOfBonds();
 		}
 		for (Bar bar : bars) {
-			if (bar.isStartingNodeJoint()) {
+			if (bar.isStartingNodeReleased()) {
 				bonds += 2;
 			}
-			if (bar.isEndingNodeJoint()) {
+			if (bar.isEndingNodeReleased()) {
 				bonds += 2;
 			}
 		}
@@ -172,5 +281,13 @@ public class Project {
 
 	public boolean isGeometricallyStable() {
 		return false;
+	}
+
+	public Project(String name) {
+		this.name = name;
+	}
+
+	public String toString() {
+		return name;
 	}
 }

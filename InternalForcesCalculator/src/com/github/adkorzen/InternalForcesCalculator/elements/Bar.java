@@ -3,13 +3,12 @@ package com.github.adkorzen.InternalForcesCalculator.elements;
 public class Bar implements Element {
 	private final PairOfNodes<Node> nodes;
 	private final Line line;
-	private boolean startJoint;
-	private boolean endJoint;
+	private boolean startReleased;
+	private boolean endReleased;
 
 	public Bar(Project project, Node first, Node second) {
 		nodes = new PairOfNodes<Node>(first, second);
 		line = new Line(first.getX(), first.getY(), second.getX(), second.getY());
-		
 	}
 
 	public boolean contains(Point point) {
@@ -20,7 +19,22 @@ public class Bar implements Element {
 				|| point.getX() - Project.ACCURACY > getEndingNode().getX()) {
 			return false;
 		}
+		double y = point.getY();
+		double yLow = Math.min(getStartingNode().getY(), getEndingNode().getY());
+		double yHigh = Math.max(getStartingNode().getY(), getEndingNode().getY());
+		
+		if (line.getAngle() == Double.POSITIVE_INFINITY && (Math.abs(y - Project.ACCURACY) > yHigh || Math.abs(y + Project.ACCURACY) < yLow)) {
+			return false;
+		}
 		return true;
+	}
+	
+	public boolean contains(Node n) {
+		double x = n.getX();
+		double y = n.getY();
+		
+		boolean result = contains(new Point(x, y));
+		return result;
 	}
 
 	public Node getStartingNode() {
@@ -31,43 +45,33 @@ public class Bar implements Element {
 		return nodes.getEnd();
 	}
 
-	public void setStartingNodeJoint(boolean joint) {
-		Node node = getStartingNode();
-		setNodeJoint(node, joint);
+	public void setStartingNodeReleased(boolean released) {
+		startReleased = released;
 	}
 
-	public void setEndingNodeJoint(boolean joint) {
-		Node node = getEndingNode();
-		setNodeJoint(node, joint);
+	public void setEndingNodeReleased(boolean released) {
+		endReleased = released;
 	}
 
-	private void setNodeJoint(Node node, boolean joint) {
-		if (node == getStartingNode()) {
-			if (startJoint || node.getSupport() == null) {
-				startJoint = joint;
-				return;
-			}
-		} else if (node == getEndingNode()) {
-			if (endJoint || node.getSupport() == null) {
-				endJoint = joint;
-				return;
-			}
+	public boolean isStartingNodeReleased() {
+		return startReleased;
+	}
+
+	public boolean isEndingNodeReleased() {
+		return endReleased;
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		Bar other = (Bar) o;
+		if (!getStartingNode().equals(other.getStartingNode())) {
+			return false;
+		} else if (!getEndingNode().equals(other.getEndingNode())) {
+			return false;
+		} else if (!line.equals(other.line)) {
+			return false;
 		}
-		if (node.getSupport().equals(Support.FIXED)) {
-			node.setSupport(Support.HINGED);
-		} else if (node.getSupport().equals(Support.SLIDER)) {
-			node.setSupport(Support.ROLLER);
-		} else {
-			System.out.println("Cannot release node with not blocked rotation.");
-		}
-	}
-
-	public boolean isStartingNodeJoint() {
-		return startJoint;
-	}
-
-	public boolean isEndingNodeJoint() {
-		return endJoint;
+		return true;
 	}
 
 	private class PairOfNodes<T> {

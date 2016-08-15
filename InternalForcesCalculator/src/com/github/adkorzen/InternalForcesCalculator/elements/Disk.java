@@ -5,11 +5,17 @@ import java.util.Iterator;
 import java.util.List;
 
 public class Disk {
-	private final Project project;
 	private List<Bar> elements = new ArrayList<Bar>();
 	
-	public Disk(Project project) {
-		this.project = project;
+	public Disk() {
+	}
+	
+	public Disk(Bar bar) {
+		elements.add(bar);
+	}
+	
+	public void addBar(Bar bar) {
+		elements.add(bar);
 	}
 	
 //	public void merge(Disk other) {

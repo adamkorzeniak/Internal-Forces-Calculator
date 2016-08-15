@@ -11,14 +11,6 @@ public class Node implements Element {
 		this.point = new Point(x, y);
 	}
 
-	public double getX() {
-		return point.getX();
-	}
-
-	public double getY() {
-		return point.getY();
-	}
-
 	public void setSupport(Support support) {
 		setSupport(support, 0);
 	}
@@ -29,15 +21,7 @@ public class Node implements Element {
 		setSupportAngle(supportAngle);
 	}
 
-	public void removeSupport() {
-		support = null;
-		project.removeSupport(this);
-	}
-
-	public Support getSupport() {
-		return support;
-	}
-
+	// @Probably is going to be changed
 	public void setSupportAngle(double supportAngle) {
 		if (support != null) {
 			while (supportAngle < 0.0) {
@@ -57,29 +41,32 @@ public class Node implements Element {
 		return supportAngle;
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((point == null) ? 0 : point.hashCode());
-		result = prime * result + ((project == null) ? 0 : project.hashCode());
-		return result;
+	public void removeSupport() {
+		support = null;
+		project.removeSupport(this);
 	}
 
+	public Support getSupport() {
+		return support;
+	}
+
+	public double getX() {
+		return point.getX();
+	}
+
+	public double getY() {
+		return point.getY();
+	}
+	
+	// probably to change
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
+	public boolean equals(Object o) {
+		Node other = (Node) o;
+		if (Math.abs(getX() - other.getX()) > Project.ACCURACY) {
 			return false;
-		if (getClass() != obj.getClass())
+		} else if (Math.abs(getY() - other.getY()) > Project.ACCURACY) {
 			return false;
-		Node other = (Node) obj;
-		if (point == null) {
-			if (other.point != null)
-				return false;
-		} else if (!point.equals(other.point))
-			return false;
+		}
 		return true;
 	}
 }
