@@ -1,12 +1,20 @@
 package com.github.adkorzen.InternalForcesCalculator.elements;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.github.adkorzen.InternalForcesCalculator.loads.BarLoad;
+
 public class Bar implements Element {
+	private final Project project;
 	private final PairOfNodes<Node> nodes;
 	private final Line line;
 	private boolean startReleased;
 	private boolean endReleased;
+	private List<BarLoad> loads;
 
 	public Bar(Project project, Node first, Node second) {
+		this.project = project;
 		nodes = new PairOfNodes<Node>(first, second);
 		line = new Line(first.getX(), first.getY(), second.getX(), second.getY());
 	}
@@ -22,19 +30,59 @@ public class Bar implements Element {
 		double y = point.getY();
 		double yLow = Math.min(getStartingNode().getY(), getEndingNode().getY());
 		double yHigh = Math.max(getStartingNode().getY(), getEndingNode().getY());
-		
-		if (line.getAngle() == Double.POSITIVE_INFINITY && (Math.abs(y - Project.ACCURACY) > yHigh || Math.abs(y + Project.ACCURACY) < yLow)) {
+
+		if (line.getSlope() == Double.POSITIVE_INFINITY
+				&& (Math.abs(y - Project.ACCURACY) > yHigh || Math.abs(y + Project.ACCURACY) < yLow)) {
 			return false;
 		}
 		return true;
 	}
-	
+
 	public boolean contains(Node n) {
 		double x = n.getX();
 		double y = n.getY();
-		
+
 		boolean result = contains(new Point(x, y));
 		return result;
+	}
+
+	public void divide(double relativeDistance) {
+		if (relativeDistance < Project.MINIMAL_DISTANCE_LEAP || relativeDistance > 1 - Project.MINIMAL_DISTANCE_LEAP) {
+			System.out.println("Invalid value");
+		}
+		double xStart = getStartingNode().getX();
+		double yStart = getStartingNode().getY();
+		double xEnd = getEndingNode().getX();
+		double yEnd = getEndingNode().getY();
+
+		double xDivide = (xEnd - xStart) * relativeDistance + xStart;
+		double yDivide = (yEnd - yStart) * relativeDistance + yStart;
+
+		project.addBar(xStart, yStart, xDivide, yDivide);
+		project.addBar(xDivide, yDivide, xEnd, yEnd);
+		
+		project.removeBar(this);
+
+		if (isStartingNodeReleased()) {
+			Bar start = project.getBar((xDivide + xStart) / 2, (yDivide + yStart) / 2);
+			start.setStartingNodeReleased(true);
+		}
+		if (isEndingNodeReleased()) {
+			Bar end = project.getBar((xDivide + xEnd) / 2, (yDivide + yEnd) / 2);
+			end.setEndingNodeReleased(true);
+		}
+		project.addNode(xDivide, yDivide);
+	}
+
+	public void addLoad(BarLoad load) {
+		if (loads == null) {
+			loads = new ArrayList<BarLoad>();
+		}
+		loads.add(load);
+	}
+	
+	public List<BarLoad> getLoads() {
+		return loads;
 	}
 
 	public Node getStartingNode() {
@@ -60,18 +108,45 @@ public class Bar implements Element {
 	public boolean isEndingNodeReleased() {
 		return endReleased;
 	}
-	
+
 	@Override
-	public boolean equals(Object o) {
-		Bar other = (Bar) o;
-		if (!getStartingNode().equals(other.getStartingNode())) {
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((line == null) ? 0 : line.hashCode());
+		result = prime * result + ((nodes == null) ? 0 : nodes.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
 			return false;
-		} else if (!getEndingNode().equals(other.getEndingNode())) {
+		if (getClass() != obj.getClass())
 			return false;
-		} else if (!line.equals(other.line)) {
+		Bar other = (Bar) obj;
+		if (line == null) {
+			if (other.line != null)
+				return false;
+		} else if (!line.equals(other.line))
 			return false;
-		}
+		if (nodes == null) {
+			if (other.nodes != null)
+				return false;
+		} else if (!getStartingNode().equals(other.getStartingNode()))
+			return false;
+		else if (!getEndingNode().equals(other.getEndingNode()))
+			return false;
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		String result = String.format("Bar: P1(%.2f, %.2f), P2(%.2f, %.2f)", getStartingNode().getX(),
+				getStartingNode().getY(), getEndingNode().getX(), getEndingNode().getY());
+		return result;
 	}
 
 	private class PairOfNodes<T> {

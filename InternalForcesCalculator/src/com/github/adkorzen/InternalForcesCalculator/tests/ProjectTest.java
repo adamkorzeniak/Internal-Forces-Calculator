@@ -2,6 +2,10 @@ package com.github.adkorzen.InternalForcesCalculator.tests;
 
 import static org.junit.Assert.*;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -11,10 +15,12 @@ import com.github.adkorzen.InternalForcesCalculator.elements.Support;
 
 public class ProjectTest {
 	Project project;
+	private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
 
 	@Before
 	public void setUp() {
 		project = new Project("test");
+		System.setOut(new PrintStream(outContent));
 	}
 
 	@Test
@@ -212,5 +218,10 @@ public class ProjectTest {
 		String actual = project.toString();
 
 		assertEquals(expected, actual);
+	}
+	
+	@After
+	public void tearDown() {
+		System.setOut(null);
 	}
 }

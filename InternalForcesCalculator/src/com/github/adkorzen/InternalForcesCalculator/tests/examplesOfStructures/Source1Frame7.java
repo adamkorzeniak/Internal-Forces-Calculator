@@ -17,19 +17,20 @@ public class Source1Frame7 {
 	}
 	
 	@Test
-	public void AreNodesStable__SimpleJointedBeam_ReturnsTrue() {
+	public void AreNodesStable_PreCreatedConstruction_ReturnsTrue() {
 		boolean condition = p.areNodesStable();
 		assertTrue(condition);
 	}
 
 	@Test
-	public void IsStaticallySolvable_Source1Frame7_ReturnsTrue() {
+	public void IsStaticallySolvable_PreCreatedConstruction_ReturnsTrue() {
 		boolean condition = p.isStaticallySolvable();
 		assertTrue(condition);
 	}
 
 	@Test
-	public void IsGeometricallyStable_Source1Frame7_ReturnsTrue() {
+	public void IsGeometricallyStable_PreCreatedConstruction_ReturnsTrue() {
+		p.isStaticallySolvable();
 		boolean condition = p.isGeometricallyStable();
 		assertTrue(condition);
 	}

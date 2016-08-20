@@ -1,6 +1,8 @@
 package com.github.adkorzen.InternalForcesCalculator.tests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -12,6 +14,7 @@ import org.junit.Test;
 import com.github.adkorzen.InternalForcesCalculator.elements.Node;
 import com.github.adkorzen.InternalForcesCalculator.elements.Project;
 import com.github.adkorzen.InternalForcesCalculator.elements.Support;
+import com.github.adkorzen.InternalForcesCalculator.loads.NodeLoad;
 
 public class NodeTest {
 	private Project project;
@@ -24,7 +27,7 @@ public class NodeTest {
 		node = new Node(project, 3, 8);
 		System.setOut(new PrintStream(outContent));
 	}
-
+	
 	@Test
 	public void NodeConstructor_NumbersProvided_CreatedAndSet() {
 		double expectedX = 3.0;
@@ -44,7 +47,7 @@ public class NodeTest {
 		Support actual1 = node.getSupport();
 
 		double expected2 = 0.0;
-		double actual2 = node.getSupportAngle();
+		double actual2 = node.getSlope();
 
 		assertEquals(expected1, actual1);
 		assertEquals(expected2, actual2, Project.ACCURACY);
@@ -54,12 +57,12 @@ public class NodeTest {
 	@Test
 	public void SetSupport_FixedSupportWithAngle_SupportSetsWithAngle() {
 
-		node.setSupport(Support.FIXED, 11.5);
+		node.setSupport(Support.FIXED, 30);
 		Support expected1 = Support.FIXED;
 		Support actual1 = node.getSupport();
 
-		double expected2 = 11.5;
-		double actual2 = node.getSupportAngle();
+		double expected2 = Math.sqrt(3) / 3.0;
+		double actual2 = node.getSlope();
 
 		assertEquals(expected1, actual1);
 		assertEquals(expected2, actual2, Project.ACCURACY);
@@ -67,29 +70,74 @@ public class NodeTest {
 	}
 
 	@Test
-	public void SetSupport_FixedSupportWithNegativeAngle_SupportSetsWithPositiveAngle() {
+	public void SetSupport_FixedSupportWithDescendingAngle_NegativeSlope() {
 
-		node.setSupport(Support.FIXED, -111.5);
+		node.setSupport(Support.FIXED, 315);
 		Support expected1 = Support.FIXED;
 		Support actual1 = node.getSupport();
 
-		double expected2 = 248.5;
-		double actual2 = node.getSupportAngle();
+		double expected2 = -1;
+		double actual2 = node.getSlope();
 
 		assertEquals(expected1, actual1);
 		assertEquals(expected2, actual2, Project.ACCURACY);
 		assertNotNull(project.getSupport(3, 8));
 	}
-
+	
 	@Test
-	public void SetSupport_FixedSupportWithAbove360Angle_SupportSetsWithUnder360Angle() {
+	public void SetSupport_FixedSupportWithAscendingAngle_PositiveSlope() {
 
-		node.setSupport(Support.FIXED, 1000);
+		node.setSupport(Support.FIXED, 60);
 		Support expected1 = Support.FIXED;
 		Support actual1 = node.getSupport();
 
-		double expected2 = 280;
-		double actual2 = node.getSupportAngle();
+		double expected2 = Math.sqrt(3);
+		double actual2 = node.getSlope();
+
+		assertEquals(expected1, actual1);
+		assertEquals(expected2, actual2, Project.ACCURACY);
+		assertNotNull(project.getSupport(3, 8));
+	}
+	
+	@Test
+	public void SetSupport_FixedSupportWithDescendingAngleAbove360_NegativeSlope() {
+
+		node.setSupport(Support.FIXED, 1020);
+		Support expected1 = Support.FIXED;
+		Support actual1 = node.getSupport();
+
+		double expected2 = - Math.sqrt(3);
+		double actual2 = node.getSlope();
+
+		assertEquals(expected1, actual1);
+		assertEquals(expected2, actual2, Project.ACCURACY);
+		assertNotNull(project.getSupport(3, 8));
+	}
+	
+	@Test
+	public void SetSupport_FixedSupportWithAscendingAngleAbove360_PositiveSlope() {
+
+		node.setSupport(Support.FIXED, 750);
+		Support expected1 = Support.FIXED;
+		Support actual1 = node.getSupport();
+
+		double expected2 = Math.sqrt(3) / 3;
+		double actual2 = node.getSlope();
+
+		assertEquals(expected1, actual1);
+		assertEquals(expected2, actual2, Project.ACCURACY);
+		assertNotNull(project.getSupport(3, 8));
+	}
+	
+	@Test
+	public void SetSupport_FixedSupportWithVerticalAngle_InfiniteSlope() {
+
+		node.setSupport(Support.FIXED, -90);
+		Support expected1 = Support.FIXED;
+		Support actual1 = node.getSupport();
+
+		double expected2 = Double.POSITIVE_INFINITY;
+		double actual2 = node.getSlope();
 
 		assertEquals(expected1, actual1);
 		assertEquals(expected2, actual2, Project.ACCURACY);
@@ -98,31 +146,30 @@ public class NodeTest {
 
 	@Test
 	public void SetSupportAngle_NoSupportSet_PrintsErrorMessage() {
-
 		String expected = "There is no support in this node. Angle cannot be changed.";
 		node.setSupportAngle(25);
 
 		assertEquals(expected, outContent.toString().trim());
 	}
-
+	
 	@Test
-	public void SetSupportAngle_NegativeAngle_Adds360UntilPositive() {
-
-		double expected = 247.4;
-		node.setSupport(Support.FIXED);
-		node.setSupportAngle(-472.6);
-		double actual = node.getSupportAngle();
+	public void SetSupportAngle_AscendingAngle_PositiveSlope() {
+		node.setSupport(Support.FIXED, -90);
+		node.setSupportAngle(25);
+		
+		double actual = node.getSlope();
+		double expected = 0.46630765815499859283000619479956;
 
 		assertEquals(expected, actual, Project.ACCURACY);
 	}
-
+	
 	@Test
-	public void SetSupportAngle_Over360_Subtracts360UntilUnder360() {
-
-		double expected = 138.1;
-		node.setSupport(Support.FIXED);
-		node.setSupportAngle(1218.1);
-		double actual = node.getSupportAngle();
+	public void SetSupportAngle_DescendingAngle_NegativeSlope() {
+		node.setSupport(Support.FIXED, -90);
+		node.setSupportAngle(130);
+		
+		double actual = node.getSlope();
+		double expected = -1.1917535925942099587053080718604;
 
 		assertEquals(expected, actual, Project.ACCURACY);
 	}
@@ -143,40 +190,24 @@ public class NodeTest {
 		assertNull(node.getSupport());
 		assertNull(project.getSupport(3, 8));
 	}
-
-	// @Test
-	// public void AddBar_EmptyBarList_BarAdded() {
-	// Bar b = new Bar(project, node, new Node(project, 0,0));
-	// node.addBar(b);
-	//
-	// int actual = node.getBarList().size();
-	//
-	// assertEquals(1, actual);
-	// assertEquals(b, node.getBarList().get(0));
-	// }
-	//
-	// @Test
-	// public void AddBar_ListWithOneBar_TwoBarsAdded() {
-	// node.addBar(new Bar(project, node, new Node(project, 0,0)));
-	// Bar b = new Bar(project, node, new Node(project, 5,0));
-	// node.addBar(b);
-	//
-	// int actual = node.getBarList().size();
-	//
-	// assertEquals(2, actual);
-	// assertEquals(b, node.getBarList().get(1));
-	// }
-	//
-	// @Test
-	// public void RemoveBar_RemoveBar_BarRemoved() {
-	// node.addBar(new Bar(project, node, new Node(project, 0,0)));
-	// Bar b = new Bar(project, node, new Node(project, 5,0));
-	// node.addBar(b);
-	// node.removeBar(b);
-	// int actual = node.getBarList().size();
-	//
-	// assertEquals(1, actual);
-	// }
+	
+	@Test
+	public void AddLoad_FirstLoad_LoadListCreatedAndLoadAdded() {
+		node.addLoad(new NodeLoad.Builder().y(5).build());
+		
+		assertNotNull(node.getLoads());
+		assertEquals(5, node.getLoads().get(0).getY(), Project.ACCURACY);
+	}
+	
+	@Test
+	public void AddLoad_NextLoad_LoadAdded() {
+		node.addLoad(new NodeLoad.Builder().y(5).build());
+		node.addLoad(new NodeLoad.Builder().x(15).build());
+		
+		assertNotNull(node.getLoads());
+		assertEquals(5, node.getLoads().get(0).getY(), Project.ACCURACY);
+		assertEquals(15, node.getLoads().get(1).getX(), Project.ACCURACY);
+	}
 
 	@After
 	public void tearDown() {
