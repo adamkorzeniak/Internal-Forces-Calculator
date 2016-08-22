@@ -34,4 +34,19 @@ public class Source1Frame2 {
 		boolean condition = p.isGeometricallyStable();
 		assertTrue(condition);
 	}
+	
+	@Test
+	public void CalculateReactions_Reactions_CorrectValues() {
+		p.isStaticallySolvable();
+		p.isGeometricallyStable();
+		p.calculateReactions();
+		
+		double V1 = p.getNode(0, 6).getReactions().getY();
+		double H2 = p.getNode(8, 3).getReactions().getX();
+		double M2 = p.getNode(8, 3).getReactions().getMoment();
+		
+		assertEquals(10, V1, Project.ACCURACY);
+		assertEquals(-6, H2, Project.ACCURACY);
+		assertEquals(-40, M2, Project.ACCURACY);
+	}
 }

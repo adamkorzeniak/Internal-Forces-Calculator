@@ -5,6 +5,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.github.adkorzen.InternalForcesCalculator.loads.NodeLoad;
+import com.github.adkorzen.InternalForcesCalculator.results.Reaction;
+
 public class Project {
 
 	public static final double ACCURACY = 0.000001;
@@ -97,6 +100,13 @@ public class Project {
 			return true;
 		}
 		return false;
+	}
+	
+	// To implement
+	public void calculateReactions() {
+		for (Node support: supports) {
+			support.setReactions(new Reaction(new NodeLoad.Builder().build()));
+		}
 	}
 
 	private void createDisks() {

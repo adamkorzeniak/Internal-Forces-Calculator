@@ -34,4 +34,21 @@ public class Source7Beam6 {
 		boolean condition = p.isGeometricallyStable();
 		assertTrue(condition);
 	}
+	
+	@Test
+	public void CalculateReactions_Reactions_CorrectValues() {
+		p.isStaticallySolvable();
+		p.isGeometricallyStable();
+		p.calculateReactions();
+		
+		double V1 = p.getNode(0, 0).getReactions().getY();
+		double V2 = p.getNode(2, 0).getReactions().getY();
+		double V3 = p.getNode(11, 0).getReactions().getY();
+		double M3 = p.getNode(11, 0).getReactions().getMoment();
+		
+		assertEquals(-7.5, V1, Project.ACCURACY);
+		assertEquals(-37.5, V2, Project.ACCURACY);
+		assertEquals(40, V3, Project.ACCURACY);
+		assertEquals(60, M3, Project.ACCURACY);
+	}
 }

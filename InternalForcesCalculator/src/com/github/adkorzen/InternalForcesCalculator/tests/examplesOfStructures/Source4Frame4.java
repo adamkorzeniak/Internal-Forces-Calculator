@@ -16,13 +16,13 @@ public class Source4Frame4 {
 		p = createSource4Frame4();
 	}
 	
-//	@Test
+	@Test
 	public void AreNodesStable_PreCreatedConstruction_ReturnsTrue() {
 		boolean condition = p.areNodesStable();
 		assertTrue(condition);
 	}
 
-//	@Test
+	@Test
 	public void IsStaticallySolvable_PreCreatedConstruction_ReturnsTrue() {
 		boolean condition = p.isStaticallySolvable();
 		assertTrue(condition);
@@ -33,5 +33,20 @@ public class Source4Frame4 {
 		p.isStaticallySolvable();
 		boolean condition = p.isGeometricallyStable();
 		assertTrue(condition);
+	}
+	
+	@Test
+	public void CalculateReactions_Reactions_CorrectValues() {
+		p.isStaticallySolvable();
+		p.isGeometricallyStable();
+		p.calculateReactions();
+		
+		double H1 = p.getNode(2, 0).getReactions().getX();
+		double V1 = p.getNode(2, 0).getReactions().getY();
+		double V2 = p.getNode(6, 0).getReactions().getY();
+		
+		assertEquals(0, H1, Project.ACCURACY);
+		assertEquals(5.5, V1, Project.ACCURACY);
+		assertEquals(2.5, V2, Project.ACCURACY);
 	}
 }

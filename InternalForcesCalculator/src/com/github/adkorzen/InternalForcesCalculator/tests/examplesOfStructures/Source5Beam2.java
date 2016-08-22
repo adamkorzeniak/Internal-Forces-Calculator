@@ -34,4 +34,19 @@ public class Source5Beam2 {
 		boolean condition = p.isGeometricallyStable();
 		assertTrue(condition);
 	}
+	
+	@Test
+	public void CalculateReactions_Reactions_CorrectValues() {
+		p.isStaticallySolvable();
+		p.isGeometricallyStable();
+		p.calculateReactions();
+		
+		double H1 = p.getNode(0, 0).getReactions().getX();
+		double V1 = p.getNode(0, 0).getReactions().getY();
+		double M1 = p.getNode(0, 0).getReactions().getMoment();
+		
+		assertEquals(10, H1, Project.ACCURACY);
+		assertEquals(15, V1, Project.ACCURACY);
+		assertEquals(82.5, M1, Project.ACCURACY);
+	}
 }

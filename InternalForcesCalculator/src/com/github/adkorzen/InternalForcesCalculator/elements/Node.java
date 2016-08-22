@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.github.adkorzen.InternalForcesCalculator.loads.NodeLoad;
+import com.github.adkorzen.InternalForcesCalculator.results.Reaction;
 
 public class Node implements Element {
 	private final Project project;
@@ -11,6 +12,7 @@ public class Node implements Element {
 	private Support support;
 	private double slope;
 	private List<NodeLoad> loads;
+	private Reaction reactions;
 
 	public Node(Project project, double x, double y) {
 		this.project = project;
@@ -74,7 +76,18 @@ public class Node implements Element {
 	public double getY() {
 		return point.getY();
 	}
-
+	
+	public void setReactions(Reaction reactions) {
+		this.reactions = reactions;
+	}
+	
+	public void removeReactions() {
+		reactions = null;
+	}
+	
+	public Reaction getReactions() {
+		return reactions;
+	}
 
 	@Override
 	public int hashCode() {
