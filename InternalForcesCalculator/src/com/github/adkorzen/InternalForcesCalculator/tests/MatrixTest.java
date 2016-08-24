@@ -157,4 +157,30 @@ public class MatrixTest {
 
 		assertArrayEquals(expecteds, actuals, Project.ACCURACY);
 	}
+
+	@Test
+	public void GausseElimination_4x8Matrix_EliminateAndCut() {
+
+		double[][] matrix = { { 0, 3, 2, 1, 20 }, { 1, 0, 5, 6, 12 }, { -2, 3, 0, -1, 22 }, { 3, -2, -2, 0, -17 },
+				{ 1, 1, 1, 1, 6 }, { 1, 3, 2, 1, 17 }, { 2, -5, 8, -2, -75 }, { -1, -3, 5, 7, 2 } };
+
+		double[] expecteds = { -3, 7, -3, 5 };
+		double[] actuals = gaussianElimination(matrix);
+
+		assertArrayEquals(expecteds, actuals, Project.ACCURACY);
+	}
+
+	@Test
+	public void GausseElimination_6x10Matrix_EliminateAndCut() {
+
+		double[][] matrix = { { 2, -5, -1, 1, 3, -3, -30.5 }, { 4, -1, -1, 2, 3, 3, -14.5 }, { -3, 3, 3, 4, 4, 2, 28 },
+				{ -4, 1, -1, 5, 2, 2, 13 }, { 2, -1, -1, -2, -3, 3, -8.5 }, { 0, 3, -5, -2, 5, -5, -12.5 },
+				{ -1, 4, -3, 1, 0, 1, 10.5 }, { 0, 3, 4, -4, -1, -2, 20 }, { -3, 3, 5, -3, 4, -2, 25 },
+				{ -2, -2, -4, -4, 0, 3, -18.5 } };
+
+		double[] expecteds = { -2, 4, 3, 1, -1, 0.5 };
+		double[] actuals = gaussianElimination(matrix);
+
+		assertArrayEquals(expecteds, actuals, Project.ACCURACY);
+	}
 }
