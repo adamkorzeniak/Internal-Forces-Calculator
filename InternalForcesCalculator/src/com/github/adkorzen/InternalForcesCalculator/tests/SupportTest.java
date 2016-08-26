@@ -28,10 +28,10 @@ public class SupportTest {
 	@Test
 	public void CreateSupport_RollerSupport_RollerBlockadesSets() {
 		Support s = Support.ROLLER;
-		boolean expectedX = true;
+		boolean expectedX = false;
 		boolean actualX = s.isXMoveBlocked();
 		
-		boolean expectedY = false;
+		boolean expectedY = true;
 		boolean actualY = s.isYMoveBlocked();
 		
 		boolean expectedRotation = false;

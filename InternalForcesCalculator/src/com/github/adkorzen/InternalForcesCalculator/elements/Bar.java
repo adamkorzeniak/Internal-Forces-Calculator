@@ -49,18 +49,20 @@ public class Bar implements Element {
 	public void divide(double relativeDistance) {
 		if (relativeDistance < Project.MINIMAL_DISTANCE_LEAP || relativeDistance > 1 - Project.MINIMAL_DISTANCE_LEAP) {
 			System.out.println("Invalid value");
+			return;
 		}
+		Point divide = getPoint(relativeDistance);
 		double xStart = getStartingNode().getX();
 		double yStart = getStartingNode().getY();
 		double xEnd = getEndingNode().getX();
 		double yEnd = getEndingNode().getY();
 
-		double xDivide = (xEnd - xStart) * relativeDistance + xStart;
-		double yDivide = (yEnd - yStart) * relativeDistance + yStart;
+		double xDivide = divide.getX();
+		double yDivide = divide.getY();
 
 		project.addBar(xStart, yStart, xDivide, yDivide);
 		project.addBar(xDivide, yDivide, xEnd, yEnd);
-		
+
 		project.removeBar(this);
 
 		if (isStartingNodeReleased()) {
@@ -74,13 +76,28 @@ public class Bar implements Element {
 		project.addNode(xDivide, yDivide);
 	}
 
+	public Point getPoint(double relativeDistance) {
+		if (relativeDistance < Project.MINIMAL_DISTANCE_LEAP || relativeDistance > 1 - Project.MINIMAL_DISTANCE_LEAP) {
+			System.out.println("It needs to be between 0 and 1");
+		}
+		double xStart = getStartingNode().getX();
+		double yStart = getStartingNode().getY();
+		double xEnd = getEndingNode().getX();
+		double yEnd = getEndingNode().getY();
+
+		double xDivide = (xEnd - xStart) * relativeDistance + xStart;
+		double yDivide = (yEnd - yStart) * relativeDistance + yStart;
+		Point result = new Point(xDivide, yDivide);
+		return result;
+	}
+
 	public void addLoad(BarLoad load) {
 		if (loads == null) {
 			loads = new ArrayList<BarLoad>();
 		}
 		loads.add(load);
 	}
-	
+
 	public List<BarLoad> getLoads() {
 		return loads;
 	}

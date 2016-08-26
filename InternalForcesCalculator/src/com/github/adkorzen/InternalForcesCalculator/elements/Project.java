@@ -5,8 +5,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.github.adkorzen.InternalForcesCalculator.loads.BarLoad;
 import com.github.adkorzen.InternalForcesCalculator.loads.NodeLoad;
-import com.github.adkorzen.InternalForcesCalculator.results.Reaction;
+import com.github.adkorzen.InternalForcesCalculator.matrix.Matrix;
+import com.github.adkorzen.InternalForcesCalculator.results.Force;
+import com.github.adkorzen.InternalForcesCalculator.results.LinearForce;
+import com.github.adkorzen.InternalForcesCalculator.results.RotationForce;
 
 public class Project {
 
@@ -19,6 +23,9 @@ public class Project {
 	private List<Node> supports = new ArrayList<Node>();
 	private List<Bar> bars = new ArrayList<Bar>();
 	private List<Disk> disks = new ArrayList<Disk>();
+
+	private List<Force> forces;
+	private List<Force> reactions;
 
 	public Project(String name) {
 		this.name = name;
@@ -100,13 +107,6 @@ public class Project {
 			return true;
 		}
 		return false;
-	}
-	
-	// To implement
-	public void calculateReactions() {
-		for (Node support: supports) {
-			support.setReactions(new Reaction(new NodeLoad.Builder().build()));
-		}
 	}
 
 	private void createDisks() {
@@ -358,6 +358,194 @@ public class Project {
 			}
 		}
 		disksChanged = true;
+	}
+
+	public void calculateReactions() {
+		generateReactions();
+		generateForces();
+
+		double[][] matrix = generateMatrix();
+		double[] results = Matrix.gaussianElimination(matrix);
+
+		for (int i = 0; i < results.length; i++) {
+			Force reaction = reactions.get(i);
+			reaction.setValue(results[i]);
+			Point p = reaction.getPoint();
+			this.getNode(p.getX(), p.getY()).setReaction(reaction);
+		}
+	}
+
+	private void generateReactions() {
+		reactions = new ArrayList<Force>();
+
+		for (Node node : supports) {
+			Support support = node.getSupport();
+			double slope = node.getSlope();
+			double verticalSlope = 0;
+			if (slope == 0) {
+				verticalSlope = Double.POSITIVE_INFINITY;
+			} else if (slope == Double.POSITIVE_INFINITY) {
+				verticalSlope = 0;
+			} else {
+				verticalSlope = -1.0 / slope;
+			}
+			double x = node.getX();
+			double y = node.getY();
+			Point point = new Point(x, y);
+
+			if (support == Support.FIXED) {
+				LinearForce react1 = new LinearForce(point, slope);
+				LinearForce react2 = new LinearForce(point, verticalSlope);
+				RotationForce react3 = new RotationForce(point);
+				reactions.add(react1);
+				reactions.add(react2);
+				reactions.add(react3);
+			} else if (support == Support.SLIDER) {
+				LinearForce react1 = new LinearForce(point, slope);
+				RotationForce react2 = new RotationForce(point);
+				reactions.add(react1);
+				reactions.add(react2);
+			} else if (support == Support.HINGED) {
+				LinearForce react1 = new LinearForce(point, slope);
+				LinearForce react2 = new LinearForce(point, verticalSlope);
+				reactions.add(react1);
+				reactions.add(react2);
+			} else if (support == Support.ROLLER) {
+				LinearForce react1 = new LinearForce(point, verticalSlope);
+				reactions.add(react1);
+			}
+		}
+	}
+
+	private void generateForces() {
+		forces = new ArrayList<Force>();
+		// implement angled forces
+		for (Node node : nodes) {
+			List<NodeLoad> loads = node.getLoads();
+			if (loads == null) {
+				continue;
+			}
+			for (NodeLoad load : loads) {
+				if (load.getX() != 0) {
+					LinearForce f = new LinearForce(new Point(node.getX(), node.getY()), 0, load.getX());
+					forces.add(f);
+				}
+				if (load.getY() != 0) {
+					LinearForce f = new LinearForce(new Point(node.getX(), node.getY()), Double.POSITIVE_INFINITY,
+							load.getY());
+					forces.add(f);
+				}
+				if (load.getMoment() != 0) {
+					RotationForce f = new RotationForce(new Point(node.getX(), node.getY()), load.getMoment());
+					forces.add(f);
+				}
+			}
+		}
+		for (Bar bar : bars) {
+			List<BarLoad> loads = bar.getLoads();
+			if (loads == null) {
+				continue;
+			}
+			for (BarLoad load : loads) {
+				double x1 = load.getX1();
+				double x2 = load.getX2();
+				double y1 = load.getY1();
+				double y2 = load.getY2();
+				double moment1 = load.getMoment1();
+				double moment2 = load.getMoment2();
+
+				// to change
+				if (x1 != 0 || x2 != 0) {
+					double length = 0;
+					if (load.isProjected()) {
+						length = Math.abs(bar.getStartingNode().getY() - bar.getEndingNode().getY());
+					} else {
+						length = Math.abs(bar.getStartingNode().getPoint().distanceTo(bar.getEndingNode().getPoint()));
+					}
+					if (x1 != -x2) {
+						double relative = (x2 * 2 / 3 + x1 / 3) / (x1 + x2);
+
+						Point forcePoint = bar.getPoint(relative);
+						double value = (x1 + x2) / 2 * length;
+						LinearForce f = new LinearForce(forcePoint, 0, value);
+						forces.add(f);
+					}
+				}
+				if (y1 != 0 || y2 != 0) {
+					double length = 0;
+					if (load.isProjected()) {
+						length = Math.abs(bar.getStartingNode().getX() - bar.getEndingNode().getX());
+					} else {
+						length = Math.abs(bar.getStartingNode().getPoint().distanceTo(bar.getEndingNode().getPoint()));
+					}
+					if (y1 != -y2) {
+						double relative = (y2 * 2 / 3 + y1 / 3) / (y1 + y2);
+
+						Point forcePoint = bar.getPoint(relative);
+						double value = (y1 + y2) / 2 * length;
+						LinearForce f = new LinearForce(forcePoint, Double.POSITIVE_INFINITY, value);
+						forces.add(f);
+					}
+				}
+				if (moment1 != 0 || moment2 != 0) {
+					double length = 0;
+					if (load.isProjected()) {
+						length = Math.abs(bar.getStartingNode().getX() - bar.getEndingNode().getX());
+					} else {
+						length = Math.abs(bar.getStartingNode().getPoint().distanceTo(bar.getEndingNode().getPoint()));
+					}
+					if (moment1 != -moment2) {
+						double relative = (moment2 * 2 / 3 + moment1 / 3) / (moment1 + moment2);
+
+						Point forcePoint = bar.getPoint(relative);
+						double value = (moment1 + moment2) / 2 * length;
+						RotationForce f = new RotationForce(forcePoint, value);
+						forces.add(f);
+					}
+				}
+			}
+		}
+	}
+
+	private double[][] generateMatrix() {
+		int numOfReactions = reactions.size();
+		int numOfNodes = nodes.size();
+
+		double[][] matrix = new double[numOfNodes + 2][numOfReactions + 1];
+
+		// Equation in direction X
+		for (int i = 0; i < numOfReactions; i++) {
+			matrix[0][i] = reactions.get(i).calculateXForce();
+		}
+		double xFree = 0;
+		for (Force f : forces) {
+			xFree += f.calculateXForce();
+		}
+		matrix[0][numOfReactions] = -xFree;
+
+		// Equation in direction Y
+		for (int i = 0; i < numOfReactions; i++) {
+			matrix[1][i] = reactions.get(i).calculateYForce();
+		}
+		double yFree = 0;
+		for (Force f : forces) {
+			yFree += f.calculateYForce();
+		}
+		matrix[1][numOfReactions] = -yFree;
+
+		// Equations for rotations
+		for (int n = 0; n < numOfNodes; n++) {
+			Point point = new Point(nodes.get(n).getX(), nodes.get(n).getY());
+			for (int i = 0; i < numOfReactions; i++) {
+				matrix[n + 2][i] = reactions.get(i).calculateMoment(point);
+			}
+			double free = 0;
+			for (Force f : forces) {
+				free += f.calculateMoment(point);
+			}
+			matrix[n + 2][numOfReactions] = -free;
+		}
+		return matrix;
 	}
 
 	private void addFoundationDisk() {

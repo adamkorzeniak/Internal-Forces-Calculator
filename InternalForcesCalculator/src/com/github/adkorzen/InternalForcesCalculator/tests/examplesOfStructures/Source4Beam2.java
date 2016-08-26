@@ -41,11 +41,11 @@ public class Source4Beam2 {
 		p.isGeometricallyStable();
 		p.calculateReactions();
 		
-		double H1 = p.getNode(0, 0).getReactions().getX();
-		double M1 = p.getNode(0, 0).getReactions().getMoment();
-		double V2 = p.getNode(6, 0).getReactions().getY();
-		double V3 = p.getNode(8, 0).getReactions().getY();
-		double V4 = p.getNode(14, 0).getReactions().getY();
+		double H1 = p.getNode(0, 0).getHorizontalReaction();
+		double M1 = p.getNode(0, 0).getMomentReaction();
+		double V2 = p.getNode(6, 0).getVerticalReaction();
+		double V3 = p.getNode(8, 0).getVerticalReaction();
+		double V4 = p.getNode(14, 0).getVerticalReaction();
 		
 		assertEquals(0, H1, Project.ACCURACY);
 		assertEquals(16, M1, Project.ACCURACY);

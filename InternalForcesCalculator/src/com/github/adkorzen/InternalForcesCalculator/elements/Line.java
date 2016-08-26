@@ -1,44 +1,36 @@
 package com.github.adkorzen.InternalForcesCalculator.elements;
 
 public class Line {
-	private final double x, y;
+	private final Point point;
 	private final double slope;
 
 	public Line(double x1, double y1, double x2, double y2) {
 
 		if (Math.abs(x1 - x2) < Project.ACCURACY) {
-			x = x1;
-			y = 0;
 			slope = Double.POSITIVE_INFINITY;
 		} else if (Math.abs(y1 - y2) < Project.ACCURACY) {
-			x = 0;
-			y = y1;
 			slope = 0;
 		} else {
-			x = 0;
 			slope = (y2 - y1) / (x2 - x1);
-			y = y1 - x1 * slope;
 		}
+		point = new Point(x1, y1);
 	}
 
 	public Line(Point point, double slope) {
 		this.slope = slope;
-		if (slope == Double.POSITIVE_INFINITY) {
-			x = point.getX();
-			y = 0;
-		} else {
-			x = 0;
-			y = point.getY() - point.getX() * slope;
-		}
+		this.point = point;
 	}
 
 	public boolean contains(Point p) {
-		if (slope == Double.POSITIVE_INFINITY && Math.abs(x - p.getX()) < Project.ACCURACY) {
+		if (slope == Double.POSITIVE_INFINITY && Math.abs(this.point.getX() - p.getX()) < Project.ACCURACY) {
 			return true;
 		}
 
-		double difference = Math.abs(p.getX() * slope + y - p.getY());
+		if (p.equals(this.point)) {
+			return true;
+		}
 
+		double difference = Math.abs((p.getY() - this.point.getY()) / (p.getX() - this.point.getX()) - slope);
 		if (difference < Project.ACCURACY) {
 			return true;
 		}
@@ -56,32 +48,53 @@ public class Line {
 		double yAxis = 0;
 		
 		if (this.slope == Double.POSITIVE_INFINITY) {
-			xAxis = this.x;
-			yAxis = other.y + xAxis * other.slope;
+			xAxis = this.point.getX();
+			yAxis = other.point.getY() + (xAxis - other.point.getX()) * other.slope;
 		} else if (other.slope == Double.POSITIVE_INFINITY) {
-			xAxis = other.x;
-			yAxis = this.y + xAxis * this.slope;
+			xAxis = other.point.getX();
+			yAxis = this.point.getY() + (xAxis - this.point.getX()) * this.slope;
 		} else {
-			xAxis = (other.y - this.y) / (this.slope - other.slope);
-			yAxis = xAxis * this.slope + this.y;
+			xAxis = (this.point.getY() - other.point.getY() + other.slope * other.point.getX() - this.slope * this.point.getX()) / (other.slope - this.slope);
+			yAxis = (xAxis - this.point.getX()) * this.slope + this.point.getY();
 		}
 		return new Point(xAxis, yAxis);
+	}
+	
+	public double distanceTo(Point point) {
+		if (this.contains(point)) {
+			return 0;
+		} else if (slope == Double.POSITIVE_INFINITY) {
+			return point.getX() - this.point.getX();
+		} else if (slope == 0) {
+			return this.point.getY() - point.getY();
+		}
+		double otherSlope = - 1.0 / slope;
+		Line other = new Line(point, otherSlope);
+		Point crossPoint = this.getCrossPoint(other);
+		
+		double distance = point.distanceTo(crossPoint);
+		if (slope > 0 && point.getX() < crossPoint.getX() || slope < 0 && point.getX() > crossPoint.getX()) {
+			distance *= -1;
+		}
+		
+		return distance;
 	}
 
 	public double getSlope() {
 		return slope;
 	}
+	
+	public Point getPoint() {
+		return point;
+	}
 
+	//poprawiæ uwzglêdniaj¹c czy punkt jest na linii
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		long temp;
 		temp = Double.doubleToLongBits(slope);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(x);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(y);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
 		return result;
 	}
@@ -95,18 +108,20 @@ public class Line {
 		if (getClass() != obj.getClass())
 			return false;
 		Line other = (Line) obj;
-		if (Math.abs(slope - other.slope) > Project.ACCURACY)
+		if (Double.doubleToLongBits(slope) != Double.doubleToLongBits(other.slope))
 			return false;
-		if (Math.abs(x - other.x) > Project.ACCURACY)
+		if (!this.contains(other.point)) {
 			return false;
-		if (Math.abs(y - other.y) > Project.ACCURACY)
+		}
+		if (!other.contains(this.point)){
 			return false;
+		}
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		String result = String.format("Line: %.1f, %.1f + %.1f", x, y, slope);
+		String result = String.format("Line: %.1f, %.1f + %.1f", point.getX(), point.getY(), slope);
 		return result;
 	}
 }

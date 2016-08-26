@@ -41,9 +41,9 @@ public class Source7Beam2 {
 		p.isGeometricallyStable();
 		p.calculateReactions();
 		
-		double H1 = p.getNode(0, 0).getReactions().getX();
-		double V1 = p.getNode(0, 0).getReactions().getY();
-		double V2 = p.getNode(10, 0).getReactions().getY();
+		double H1 = p.getNode(0, 0).getHorizontalReaction();
+		double V1 = p.getNode(0, 0).getVerticalReaction();
+		double V2 = p.getNode(10, 0).getVerticalReaction();
 		
 		assertEquals(20, H1, Project.ACCURACY);
 		assertEquals(22, V1, Project.ACCURACY);

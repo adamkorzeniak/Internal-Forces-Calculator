@@ -33,7 +33,17 @@ public class Point {
 		}
 		return common;
 	}
-	
+
+	public double distanceTo(Point other) {
+		if (this.equals(other)) {
+			return 0;
+		} else if (Math.abs(this.x - other.x) < Project.ACCURACY) {
+			return Math.abs(this.y - other.y);
+		}
+		double distance = Math.abs(Math.sqrt(Math.pow((this.y - other.y), 2) + Math.pow((this.x - other.x), 2)));
+		return distance;
+	}
+
 	public double getX() {
 		return x;
 	}

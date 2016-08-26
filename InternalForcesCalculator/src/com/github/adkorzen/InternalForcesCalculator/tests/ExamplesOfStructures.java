@@ -46,7 +46,7 @@ public class ExamplesOfStructures {
 		nl = new NodeLoad.Builder().moment(2).build();
 		p.getNode(7, 4).addLoad(nl);
 		nl = new NodeLoad.Builder().y(-3).build();
-		p.getNode(7, 4).addLoad(nl);
+		p.getNode(9, 5).addLoad(nl);
 		
 		return p;
 	}
@@ -80,7 +80,7 @@ public class ExamplesOfStructures {
 		p.getBar(4, 2).addLoad(bl);
 		nl = new NodeLoad.Builder().moment(10).build();
 		p.getNode(4, 3).addLoad(nl);
-		nl = new NodeLoad.Builder().y(10).build();
+		nl = new NodeLoad.Builder().y(-10).build();
 		p.getNode(4, 0).addLoad(nl);
 		return p;
 	}
@@ -388,7 +388,7 @@ public class ExamplesOfStructures {
 		p.getBar(4, 2).setStartingNodeReleased(true);
 		
 		bl = new BarLoad.Builder().y(-2).build();
-		p.getBar(2, 4).divide(2.0 / 3);
+		p.getBar(3, 4).divide(2.0 / 3);
 		p.getBar(5, 4).addLoad(bl);
 		nl = new NodeLoad.Builder().y(-4).build();
 		p.getNode(0, 4).addLoad(nl);

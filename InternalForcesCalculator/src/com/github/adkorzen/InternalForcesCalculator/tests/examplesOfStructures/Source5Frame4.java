@@ -41,12 +41,12 @@ public class Source5Frame4 {
 		p.isGeometricallyStable();
 		p.calculateReactions();
 		
-		double H1 = p.getNode(0, 0).getReactions().getX();
-		double V1 = p.getNode(0, 0).getReactions().getY();
-		double V2 = p.getNode(8, 1).getReactions().getY();
+		double H1 = p.getNode(0, 0).getHorizontalReaction();
+		double V1 = p.getNode(0, 0).getVerticalReaction();
+		double V2 = p.getNode(8, 1).getVerticalReaction();
 		
 		assertEquals(-8, H1, Project.ACCURACY);
-		assertEquals(4.88, V1, Project.ACCURACY);
-		assertEquals(10.12, V2, Project.ACCURACY);
+		assertEquals(39.0 / 8, V1, Project.ACCURACY);
+		assertEquals(81.0 / 8, V2, Project.ACCURACY);
 	}
 }

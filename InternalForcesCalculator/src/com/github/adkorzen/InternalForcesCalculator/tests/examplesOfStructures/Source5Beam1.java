@@ -41,12 +41,12 @@ public class Source5Beam1 {
 		p.isGeometricallyStable();
 		p.calculateReactions();
 		
-		double H1 = p.getNode(0, 0).getReactions().getX();
-		double V1 = p.getNode(0, 0).getReactions().getY();
-		double V2 = p.getNode(11, 0).getReactions().getY();
+		double H1 = p.getNode(0, 0).getHorizontalReaction();
+		double V1 = p.getNode(0, 0).getVerticalReaction();
+		double V2 = p.getNode(11, 0).getVerticalReaction();
 		
 		assertEquals(0, H1, Project.ACCURACY);
-		assertEquals(0.27, V1, Project.ACCURACY);
-		assertEquals(1.73, V2, Project.ACCURACY);
+		assertEquals(3.0/11, V1, Project.ACCURACY);
+		assertEquals(19.0/11, V2, Project.ACCURACY);
 	}
 }

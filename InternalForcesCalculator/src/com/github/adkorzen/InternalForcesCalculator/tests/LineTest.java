@@ -220,7 +220,7 @@ public class LineTest {
 		assertEquals(expected, p.getX(), Project.ACCURACY);
 		assertEquals(expected, p.getY(), Project.ACCURACY);
 	}
-	
+
 	@Test
 	public void GetCrossPoint_TwoAscendindParallelLines_PointInInfinity() {
 		line = new Line(new Point(3, 7), 10);
@@ -232,7 +232,7 @@ public class LineTest {
 		assertEquals(expected, p.getX(), Project.ACCURACY);
 		assertEquals(10, p.getY(), Project.ACCURACY);
 	}
-	
+
 	@Test
 	public void GetCrossPoint_TwoDescendindParallelLines_PointInInfinity() {
 		line = new Line(new Point(6, 9), -1);
@@ -255,7 +255,7 @@ public class LineTest {
 
 		assertEquals(expected, p);
 	}
-	
+
 	@Test
 	public void GetCrossPoint_HorizontalAndVerticalLine_PointReturned() {
 		line = new Line(3, 5, 3, 0);
@@ -266,138 +266,256 @@ public class LineTest {
 
 		assertEquals(expected, p);
 	}
-	
+
 	@Test
 	public void GetCrossPoint_HorizontalAndAscendingLine_PointReturned() {
 		line = new Line(0, 5, 7, 12);
 		Line other = new Line(3, 0, 17, 0);
- 
+
 		Point expected = new Point(-5, 0);
 		Point p = other.getCrossPoint(line);
 
 		assertEquals(expected, p);
 	}
-	
+
 	@Test
 	public void GetCrossPoint_AscendingAndHorizontalLine_PointReturned() {
 		line = new Line(0, 5, 7, 12);
 		Line other = new Line(3, 0, 17, 0);
- 
+
 		Point expected = new Point(-5, 0);
 		Point p = line.getCrossPoint(other);
 
 		assertEquals(expected, p);
 	}
-	
+
 	@Test
 	public void GetCrossPoint_HorizontalAndDescendingLine_PointReturned() {
 		line = new Line(0, 5, 7, -9);
 		Line other = new Line(3, 1, 17, 1);
- 
+
 		Point expected = new Point(2, 1);
 		Point p = other.getCrossPoint(line);
 
 		assertEquals(expected, p);
 	}
-	
+
 	@Test
 	public void GetCrossPoint_DescendingAndHorizontalLine_PointReturned() {
 		line = new Line(0, 5, 7, -9);
 		Line other = new Line(3, 1, 17, 1);
- 
+
 		Point expected = new Point(2, 1);
 		Point p = line.getCrossPoint(other);
 
 		assertEquals(expected, p);
 	}
-	
-	
-	
+
 	@Test
 	public void GetCrossPoint_VerticalAndAscendingLine_PointReturned() {
-		line = new Line(0, 5, 7, 12);
+		line = new Line(1, 6, 7, 12);
 		Line other = new Line(3, 0, 3, 10);
- 
+
 		Point expected = new Point(3, 8);
 		Point p = other.getCrossPoint(line);
 
 		assertEquals(expected, p);
 	}
-	
+
 	@Test
 	public void GetCrossPoint_AscendingAndVerticalLine_PointReturned() {
-		line = new Line(0, 5, 7, 12);
+		line = new Line(1, 6, 7, 12);
 		Line other = new Line(3, 0, 3, 10);
- 
+
 		Point expected = new Point(3, 8);
 		Point p = line.getCrossPoint(other);
 
 		assertEquals(expected, p);
 	}
-	
+
 	@Test
 	public void GetCrossPoint_VerticalAndDescendingLine_PointReturned() {
-		line = new Line(0, 5, 7, -9);
+		line = new Line(1, 3, 7, -9);
 		Line other = new Line(3, 0, 3, 10);
- 
+
 		Point expected = new Point(3, -1);
 		Point p = other.getCrossPoint(line);
 
 		assertEquals(expected, p);
 	}
-	
+
 	@Test
 	public void GetCrossPoint_DescendingAndVerticalLine_PointReturned() {
-		line = new Line(0, 5, 7, -9);
+		line = new Line(1, 3, 7, -9);
 		Line other = new Line(3, 0, 3, 10);
- 
+
 		Point expected = new Point(3, -1);
 		Point p = line.getCrossPoint(other);
 
 		assertEquals(expected, p);
 	}
-	
+
 	@Test
 	public void GetCrossPoint_TwoAscendingLines_PointReturned() {
 		line = new Line(2, 3, 7, 13);
 		Line other = new Line(3, 0, 5, 6);
- 
+
 		Point expected = new Point(8, 15);
 		Point p = line.getCrossPoint(other);
 
 		assertEquals(expected, p);
 	}
-	
+
 	@Test
 	public void GetCrossPoint_TwoDescendingLines_PointReturned() {
 		line = new Line(4, 1.2, 7, -4.8);
 		Line other = new Line(2, 7.6, 5, -4.4);
- 
+
 		Point expected = new Point(3.2, 2.8);
 		Point p = line.getCrossPoint(other);
 
 		assertEquals(expected, p);
 	}
-	
+
 	@Test
 	public void GetCrossPoint_AscendingAndDescendingLine_PointReturned() {
 		line = new Line(3, 18.1, 0, 9.1);
 		Line other = new Line(1.5, -14.4, 0, -6.9);
- 
+
 		Point expected = new Point(-2, 3.1);
 		Point p = line.getCrossPoint(other);
 
 		assertEquals(expected, p);
 	}
-	
+
 	@Test
 	public void GetCrossPoint_DescendingAndAscendingLine_PointReturned() {
 		line = new Line(3, 18.1, 0, 9.1);
 		Line other = new Line(1.5, -14.4, 0, -6.9);
- 
+
 		Point expected = new Point(-2, 3.1);
 		Point p = other.getCrossPoint(line);
 
 		assertEquals(expected, p);
+	}
+
+	@Test
+	public void DistanceTo_PointOnVerticalLine_DistanceZero() {
+		line = new Line(3, 5, 3, 9);
+		Point point = new Point(3, 11);
+
+		double actual = line.distanceTo(point);
+
+		assertEquals(0, actual, Project.ACCURACY);
+	}
+
+	@Test
+	public void DistanceTo_PointOnHorizontalLine_DistanceZero() {
+		line = new Line(2, 4, 7, 4);
+		Point point = new Point(3, 4);
+
+		double actual = line.distanceTo(point);
+
+		assertEquals(0, actual, Project.ACCURACY);
+	}
+
+	@Test
+	public void DistanceTo_PointOnAscendingLine_DistanceZero() {
+		line = new Line(2, 4, 7, 6.5);
+		Point point = new Point(3, 4.5);
+
+		double actual = line.distanceTo(point);
+
+		assertEquals(0, actual, Project.ACCURACY);
+	}
+
+	@Test
+	public void DistanceTo_PointOnDescendingLine_DistanceZero() {
+		line = new Line(2, 4, -4, -5);
+		Point point = new Point(-1, -0.5);
+
+		double actual = line.distanceTo(point);
+
+		assertEquals(0, actual, Project.ACCURACY);
+	}
+
+	@Test
+	public void DistanceTo_PointAboveHorizontalLine_NegativeDistance() {
+		line = new Line(2, 4, 7, 4);
+		Point point = new Point(3, 9);
+
+		double actual = line.distanceTo(point);
+
+		assertEquals(-5, actual, Project.ACCURACY);
+	}
+
+	@Test
+	public void DistanceTo_PointAboveAscendingLine_NegativeDistance() {
+		line = new Line(2, 4, 7, 6.5);
+		Point point = new Point(0.5, 7);
+
+		double actual = line.distanceTo(point);
+
+		assertEquals(-3 * Math.sqrt(0.5 * 0.5 + 1 * 1), actual, Project.ACCURACY);
+	}
+
+	@Test
+	public void DistanceTo_PointAboveDescendingLine_NegativeDistance() {
+		line = new Line(-2, 4, 4, -5);
+		Point point = new Point(12, 9);
+
+		double actual = line.distanceTo(point);
+
+		assertEquals(-4 * Math.sqrt(2 * 2 + 3 * 3), actual, Project.ACCURACY);
+	}
+
+	@Test
+	public void DistanceTo_PointUnderHorizontalLine_PositiveDistance() {
+		line = new Line(2, 1, 7, 1);
+		Point point = new Point(5, -1);
+
+		double actual = line.distanceTo(point);
+
+		assertEquals(2, actual, Project.ACCURACY);
+	}
+
+	@Test
+	public void DistanceTo_PointUnderAscendingLine_PositiveDistance() {
+		line = new Line(2, 4, 10, 6);
+		Point point = new Point(15, -14);
+
+		double actual = line.distanceTo(point);
+
+		assertEquals(5 * Math.sqrt(4 * 4 + 1 * 1), actual, Project.ACCURACY);
+	}
+
+	@Test
+	public void DistanceTo_PointUnderDescendingLine_PositiveDistance() {
+		line = new Line(-3, 1, 7, -2);
+		Point point = new Point(-11, -7.5);
+
+		double actual = line.distanceTo(point);
+
+		assertEquals(Math.sqrt(3 * 3 + 10 * 10), actual, Project.ACCURACY);
+	}
+
+	@Test
+	public void DistanceTo_PointRightToVerticalLine_PositiveDistance() {
+		line = new Line(1, 2, 1, 9);
+		Point point = new Point(5, -2);
+
+		double actual = line.distanceTo(point);
+
+		assertEquals(4, actual, Project.ACCURACY);
+	}
+
+	@Test
+	public void DistanceTo_PointLeftToVerticalLine_NegativeDistance() {
+		line = new Line(-1, -2, -1, 5);
+		Point point = new Point(-4, 1);
+
+		double actual = line.distanceTo(point);
+
+		assertEquals(-3, actual, Project.ACCURACY);
 	}
 }

@@ -41,9 +41,9 @@ public class Source7Frame9 {
 		p.isGeometricallyStable();
 		p.calculateReactions();
 		
-		double H1 = p.getNode(0, 4).getReactions().getX();
-		double H2 = p.getNode(6, 0).getReactions().getX();
-		double V2 = p.getNode(6, 0).getReactions().getY();
+		double H1 = p.getNode(0, 4).getVerticalReaction();
+		double H2 = p.getNode(6, 0).getHorizontalReaction();
+		double V2 = p.getNode(6, 0).getVerticalReaction();
 		
 		assertEquals(22.5, H1, Project.ACCURACY);
 		assertEquals(-42.5, H2, Project.ACCURACY);

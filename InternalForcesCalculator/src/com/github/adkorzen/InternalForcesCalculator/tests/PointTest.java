@@ -152,4 +152,148 @@ public class PointTest {
 		
 		assertEquals(expected, actual);
 	}
+	
+	@Test
+	public void DistanceTo_EqualsPoints_DistanceZero() {
+		Point p1 = new Point(2, 3);
+		Point p2 = new Point(2,3);
+		
+		double actual = p1.distanceTo(p2);
+		assertEquals(0, actual, Project.ACCURACY);
+	}
+	
+	@Test
+	public void DistanceTo_PositivePointsVertically_ReturnsDistance() {
+		Point p1 = new Point(3, 9);
+		Point p2 = new Point(3, 1);
+		
+		double actual = p1.distanceTo(p2);
+		assertEquals(8, actual, Project.ACCURACY);
+	}
+	
+	@Test
+	public void DistanceTo_PositivePointsVertically2_ReturnsDistance() {
+		Point p1 = new Point(3, 1);
+		Point p2 = new Point(3, 9);
+		
+		double actual = p2.distanceTo(p1);
+		assertEquals(8, actual, Project.ACCURACY);
+	}
+	
+	@Test
+	public void DistanceTo_PosNegPointsVertically_ReturnsDistance() {
+		Point p1 = new Point(1, -1);
+		Point p2 = new Point(1, 4);
+		
+		double actual = p1.distanceTo(p2);
+		assertEquals(5, actual, Project.ACCURACY);
+	}
+	
+	@Test
+	public void DistanceTo_PosNegPointsVertically2_ReturnsDistance() {
+		Point p1 = new Point(1, -1);
+		Point p2 = new Point(1, 4);
+		
+		double actual = p2.distanceTo(p1);
+		assertEquals(5, actual, Project.ACCURACY);
+	}
+	
+	@Test
+	public void DistanceTo_NegativePointsVertically_ReturnsDistance() {
+		Point p1 = new Point(-1, -2);
+		Point p2 = new Point(-1, -7);
+		
+		double actual = p1.distanceTo(p2);
+		assertEquals(5, actual, Project.ACCURACY);
+	}
+	
+	@Test
+	public void DistanceTo_NegativePointsVertically2_ReturnsDistance() {
+		Point p1 = new Point(-1, -2);
+		Point p2 = new Point(-1, -7);
+		
+		double actual = p2.distanceTo(p1);
+		assertEquals(5, actual, Project.ACCURACY);
+	}
+	
+	@Test
+	public void DistanceTo_PositivePointsHorizontally_ReturnsDistance() {
+		Point p1 = new Point(3, 1);
+		Point p2 = new Point(9, 1);
+		
+		double actual = p1.distanceTo(p2);
+		assertEquals(6, actual, Project.ACCURACY);
+	}
+	
+	@Test
+	public void DistanceTo_PositivePointsHorizontally2_ReturnsDistance() {
+		Point p1 = new Point(3, 1);
+		Point p2 = new Point(9, 1);
+		
+		double actual = p2.distanceTo(p1);
+		assertEquals(6, actual, Project.ACCURACY);
+	}
+	
+	@Test
+	public void DistanceTo_PosNegPointsHorizontally_ReturnsDistance() {
+		Point p1 = new Point(-2, -1);
+		Point p2 = new Point(8, -1);
+		
+		double actual = p1.distanceTo(p2);
+		assertEquals(10, actual, Project.ACCURACY);
+	}
+	
+	@Test
+	public void DistanceTo_PosNegPointsHorizontally2_ReturnsDistance() {
+		Point p1 = new Point(-2, -1);
+		Point p2 = new Point(8, -1);
+		
+		double actual = p2.distanceTo(p1);
+		assertEquals(10, actual, Project.ACCURACY);
+	}
+	
+	@Test
+	public void DistanceTo_NegativePointsHorizontally_ReturnsDistance() {
+		Point p1 = new Point(-1, 7);
+		Point p2 = new Point(-4, 7);
+		
+		double actual = p1.distanceTo(p2);
+		assertEquals(3, actual, Project.ACCURACY);
+	}
+	
+	@Test
+	public void DistanceTo_NegativePointsHorizontally2_ReturnsDistance() {
+		Point p1 = new Point(-1, 7);
+		Point p2 = new Point(-4, 7);
+		
+		double actual = p2.distanceTo(p1);
+		assertEquals(3, actual, Project.ACCURACY);
+	}
+	
+	@Test
+	public void DistanceTo_Points_ReturnsDistance() {
+		Point p1 = new Point(-1, 7);
+		Point p2 = new Point(3, 10);
+		
+		double actual = p2.distanceTo(p1);
+		assertEquals(5, actual, Project.ACCURACY);
+	}
+	
+	@Test
+	public void DistanceTo_Points2_ReturnsDistance() {
+		Point p1 = new Point(-1, 7);
+		Point p2 = new Point(-5, 4);
+		
+		double actual = p2.distanceTo(p1);
+		assertEquals(5, actual, Project.ACCURACY);
+	}
+	
+	@Test
+	public void DistanceTo_Points3_ReturnsDistance() {
+		Point p1 = new Point(9, -1);
+		Point p2 = new Point(3, 7);
+		
+		double actual = p2.distanceTo(p1);
+		assertEquals(10, actual, Project.ACCURACY);
+	}
 }

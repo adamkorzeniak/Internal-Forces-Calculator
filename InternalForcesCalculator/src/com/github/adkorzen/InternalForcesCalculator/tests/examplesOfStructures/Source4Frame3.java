@@ -41,10 +41,10 @@ public class Source4Frame3 {
 		p.isGeometricallyStable();
 		p.calculateReactions();
 		
-		double H1 = p.getNode(0, 0).getReactions().getX();
-		double V1 = p.getNode(0, 0).getReactions().getY();
-		double H2 = p.getNode(6, 2).getReactions().getX();
-		double V2 = p.getNode(6, 2).getReactions().getY();
+		double H1 = p.getNode(0, 0).getHorizontalReaction();
+		double V1 = p.getNode(0, 0).getVerticalReaction();
+		double H2 = p.getNode(6, 2).getHorizontalReaction();
+		double V2 = p.getNode(6, 2).getVerticalReaction();
 		
 		assertEquals(-3, H1, Project.ACCURACY);
 		assertEquals(7, V1, Project.ACCURACY);

@@ -3,7 +3,7 @@ package com.github.adkorzen.InternalForcesCalculator.elements;
 public enum Support {
 	
 	HINGED(true, true, false), 
-	ROLLER(true, false, false),
+	ROLLER(false, true, false),
 	SLIDER(true, false, true), 
 	FIXED(true, true, true);
 	

@@ -1,5 +1,7 @@
 package com.github.adkorzen.InternalForcesCalculator.loads;
 
+import static com.github.adkorzen.InternalForcesCalculator.math.Math.degreeToTangent;
+
 public class BarLoad{
 	private final double x1Value;
 	private final double x2Value;
@@ -8,6 +10,7 @@ public class BarLoad{
 	private final double moment1Value;
 	private final double moment2Value;
 	private final boolean projected;
+	private final double slope;
 	
 	public static class Builder {
 		private double x1Value = 0;
@@ -17,6 +20,7 @@ public class BarLoad{
 		private double moment1Value = 0;
 		private double moment2Value = 0;
 		private boolean projected = false;
+		private double slope = 0;
 
 		public Builder x(double value) {
 			x1Value = value;
@@ -71,6 +75,11 @@ public class BarLoad{
 			return this;
 		}
 		
+		public Builder angle (double angle) {
+			slope = degreeToTangent(angle);
+			return this;
+		}
+		
 		public BarLoad build() {
 			return new BarLoad(this);
 		}
@@ -84,6 +93,7 @@ public class BarLoad{
 		moment1Value = builder.moment1Value;
 		moment2Value = builder.moment2Value;
 		projected = builder.projected;
+		slope = builder.slope;
 	}
 
 	public double getX1() {
@@ -114,4 +124,7 @@ public class BarLoad{
 		return projected;
 	}
 	
+	public double getSlope() {
+		return slope;
+	}
 }

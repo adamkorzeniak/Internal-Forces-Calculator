@@ -1,10 +1,12 @@
 package com.github.adkorzen.InternalForcesCalculator.elements;
 
+import static com.github.adkorzen.InternalForcesCalculator.math.Math.degreeToTangent;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import com.github.adkorzen.InternalForcesCalculator.loads.NodeLoad;
-import com.github.adkorzen.InternalForcesCalculator.results.Reaction;
+import com.github.adkorzen.InternalForcesCalculator.results.Force;
 
 public class Node implements Element {
 	private final Project project;
@@ -12,7 +14,8 @@ public class Node implements Element {
 	private Support support;
 	private double slope;
 	private List<NodeLoad> loads;
-	private Reaction reactions;
+	private NodeLoad reactions;
+	private List<Direction> directionBlocked;
 
 	public Node(Project project, double x, double y) {
 		this.project = project;
@@ -31,20 +34,12 @@ public class Node implements Element {
 
 	public void setSupportAngle(double supportAngle) {
 		if (support != null) {
-			while(supportAngle < 0) {
-				supportAngle += 180;
-			}
-			if (supportAngle % 180 == 90) {
-				slope = Double.POSITIVE_INFINITY;
-			} else {
-				double inRadius = supportAngle * Math.PI / 180;
-				slope = Math.tan(inRadius);
-			}
+			slope = degreeToTangent(supportAngle);
 		} else {
 			System.out.println("There is no support in this node. Angle cannot be changed.");
 		}
 	}
-	
+
 	public double getSlope() {
 		return slope;
 	}
@@ -53,20 +48,71 @@ public class Node implements Element {
 		support = null;
 		project.removeSupport(this);
 	}
-	
+
 	public void addLoad(NodeLoad load) {
 		if (loads == null) {
 			loads = new ArrayList<NodeLoad>();
 		}
 		loads.add(load);
 	}
-	
+
 	public List<NodeLoad> getLoads() {
 		return loads;
 	}
 
 	public Support getSupport() {
 		return support;
+	}
+
+	public void setReaction(Force reaction) {
+		if (getSupport() == null) {
+			System.out.println("No support. Cannot set reaction");
+			return;
+		}
+		if (directionBlocked == null) {
+			directionBlocked = new ArrayList<Direction>();
+			if (getSupport().isXMoveBlocked()) {
+				directionBlocked.add(Direction.HORIZONTAL);
+			}
+			if (getSupport().isYMoveBlocked()) {
+				directionBlocked.add(Direction.VERTICAL);
+			}
+			if (getSupport().isRotationBlocked()) {
+				directionBlocked.add(Direction.ROTATION);
+			}
+		} else if (directionBlocked.isEmpty()) {
+			System.out.println("All directions alrady set");
+		}
+		if (reactions == null) {
+			NodeLoad r = new NodeLoad.Builder().slope(slope).build();
+			reactions = r;
+		}
+		NodeLoad prev = reactions;
+		NodeLoad.Builder builder = new NodeLoad.Builder().x(prev.getX()).y(prev.getY()).moment(prev.getMoment())
+				.slope(prev.getSlope());
+		NodeLoad actualizedReaction = null;
+
+		if (directionBlocked.get(0) == Direction.HORIZONTAL) {
+			actualizedReaction = builder.x(reaction.getValue()).build();
+		} else if (directionBlocked.get(0) == Direction.VERTICAL) {
+			actualizedReaction = builder.y(reaction.getValue()).build();
+		} else if (directionBlocked.get(0) == Direction.ROTATION) {
+			actualizedReaction = builder.moment(reaction.getValue()).build();
+		}
+		directionBlocked.remove(0);
+		reactions = actualizedReaction;
+	}
+
+	public double getHorizontalReaction() {
+		return reactions.getX();
+	}
+
+	public double getVerticalReaction() {
+		return reactions.getY();
+	}
+
+	public double getMomentReaction() {
+		return reactions.getMoment();
 	}
 
 	public double getX() {
@@ -76,17 +122,8 @@ public class Node implements Element {
 	public double getY() {
 		return point.getY();
 	}
-	
-	public void setReactions(Reaction reactions) {
-		this.reactions = reactions;
-	}
-	
-	public void removeReactions() {
-		reactions = null;
-	}
-	
-	public Reaction getReactions() {
-		return reactions;
+	public Point getPoint() {
+		return point;
 	}
 
 	@Override
@@ -121,4 +158,8 @@ public class Node implements Element {
 		result += point.getY();
 		return result;
 	}
+
+	private enum Direction {
+		HORIZONTAL, VERTICAL, ROTATION
+	};
 }
