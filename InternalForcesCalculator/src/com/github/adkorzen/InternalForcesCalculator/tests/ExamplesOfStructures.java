@@ -351,7 +351,7 @@ public class ExamplesOfStructures {
 		p.getBar(5, 0).addLoad(bl);
 		nl = new NodeLoad.Builder().y(-5).build();
 		p.getNode(10, 0).addLoad(nl);
-		nl = new NodeLoad.Builder().moment(-40).build();
+		nl = new NodeLoad.Builder().moment(-4).build();
 		p.addNode(12, 0);
 		p.getNode(12, 0).addLoad(nl);
 		return p;
@@ -683,7 +683,8 @@ public class ExamplesOfStructures {
 		p.addBar(3, 4, 6, 4);
 		p.addBar(6, 2, 6, 8);
 		double proportion = 3.0 / 4.0;
-		double angle = Math.atan(proportion);
+		double radian = Math.atan(proportion);
+		double angle = radian * 180 / java.lang.Math.PI;
 		p.getNode(0, 0).setSupport(Support.FIXED, angle);
 		p.getNode(6, 2).setSupport(Support.ROLLER);
 		p.getBar(5, 4).setStartingNodeReleased(true);

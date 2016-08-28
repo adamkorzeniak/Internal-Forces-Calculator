@@ -39,11 +39,7 @@ public class Bar implements Element {
 	}
 
 	public boolean contains(Node n) {
-		double x = n.getX();
-		double y = n.getY();
-
-		boolean result = contains(new Point(x, y));
-		return result;
+		return contains(n.getPoint());
 	}
 
 	public void divide(double relativeDistance) {
@@ -89,6 +85,21 @@ public class Bar implements Element {
 		double yDivide = (yEnd - yStart) * relativeDistance + yStart;
 		Point result = new Point(xDivide, yDivide);
 		return result;
+	}
+	
+	public Point getCommonPoint(Bar other) {
+		Point cross = this.line.getCrossPoint(other.line);
+		if (cross.getX() == Double.POSITIVE_INFINITY) {
+			if(this.getStartingNode().equals(other.getStartingNode()) || this.getStartingNode().equals(other.getEndingNode())) {
+				return this.getStartingNode().getPoint();
+			} else if(this.getEndingNode().equals(other.getStartingNode()) || this.getEndingNode().equals(other.getEndingNode())) {
+				return this.getEndingNode().getPoint();
+			}
+		} 
+		if (this.contains(cross) && other.contains(cross)) {
+			return cross;
+		}
+		return null;
 	}
 
 	public void addLoad(BarLoad load) {

@@ -15,7 +15,7 @@ public class Source3Frame2 {
 	public void setUp() {
 		p = createSource3Frame2();
 	}
-	
+
 	@Test
 	public void AreNodesStable_PreCreatedConstruction_ReturnsTrue() {
 		boolean condition = p.areNodesStable();
@@ -34,21 +34,21 @@ public class Source3Frame2 {
 		boolean condition = p.isGeometricallyStable();
 		assertTrue(condition);
 	}
-	
+
 	@Test
 	public void CalculateReactions_Reactions_CorrectValues() {
 		p.isStaticallySolvable();
 		p.isGeometricallyStable();
 		p.calculateReactions();
-		
+
 		double H1 = p.getNode(0.5, 0).getHorizontalReaction();
 		double V1 = p.getNode(0.5, 0).getVerticalReaction();
 		double H2 = p.getNode(10.5, 0).getHorizontalReaction();
 		double V2 = p.getNode(10.5, 0).getVerticalReaction();
-		
-		assertEquals(-14.5, H1, Project.ACCURACY);
-		assertEquals(10.13, V1, Project.ACCURACY);
-		assertEquals(-12.33, H2, Project.ACCURACY);
-		assertEquals(19.87, V2, Project.ACCURACY);
+
+		assertEquals(-99.0 / 8, H1, Project.ACCURACY);
+		assertEquals(10.70, V1, Project.ACCURACY);
+		assertEquals(-93.0 / 8, H2, Project.ACCURACY);
+		assertEquals(19.3, V2, Project.ACCURACY);
 	}
 }

@@ -4,10 +4,11 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Arrays;
 
+import com.github.adkorzen.InternalForcesCalculator.elements.Project;
+
 public class Matrix {
 	private static final int ACCURACY = 30;
-	private static final BigDecimal accuracy = new BigDecimal(1).divide(new BigDecimal(10).pow(ACCURACY/2), ACCURACY,
-			RoundingMode.HALF_UP);
+	private static final BigDecimal accuracy = new BigDecimal(Project.ACCURACY);
 
 	public static double[] gaussianElimination(double[][] m) {
 		BigDecimal[][] matrix = fromDoubleToBigDecimal(m);

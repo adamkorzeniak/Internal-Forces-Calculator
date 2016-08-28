@@ -46,8 +46,8 @@ public class Source7Frame10 {
 		double M1 = p.getNode(0, 0).getMomentReaction();
 		double V2 = p.getNode(6, 2).getVerticalReaction();
 		
-		assertEquals(120, H1, Project.ACCURACY);
-		assertEquals(335.0 / 3, V1, Project.ACCURACY);
+		assertEquals(163, H1, Project.ACCURACY);
+		assertEquals(-52.0 / 3, V1, Project.ACCURACY);
 		assertEquals(235, M1, Project.ACCURACY);
 		assertEquals(-80.0 / 3, V2, Project.ACCURACY);
 	}

@@ -510,8 +510,9 @@ public class Project {
 	private double[][] generateMatrix() {
 		int numOfReactions = reactions.size();
 		int numOfNodes = nodes.size();
+		int numOfReleases = getNumOfReleases();
 
-		double[][] matrix = new double[numOfNodes + 2][numOfReactions + 1];
+		double[][] matrix = new double[numOfNodes + 2 * numOfReleases + 2][numOfReactions + 1];
 
 		// Equation in direction X
 		for (int i = 0; i < numOfReactions; i++) {
@@ -545,7 +546,113 @@ public class Project {
 			}
 			matrix[n + 2][numOfReactions] = -free;
 		}
+
+		// Equations for rotations left or right to release
+		int addIndex = 0;
+		for (Bar b : bars) {
+			if (b.isStartingNodeReleased()) {
+				Point point = b.getStartingNode().getPoint();
+				for (int i = 0; i < numOfReactions; i++) {
+					Force f = reactions.get(i);
+					if (connected(b, b.getStartingNode(), f)) {
+						matrix[numOfNodes + addIndex + 2][i] = f.calculateMoment(point);
+					} else {
+						matrix[numOfNodes + addIndex + 1 + 2][i] = f.calculateMoment(point);
+					}
+				}
+				double free1 = 0;
+				double free2 = 0;
+				for (Force f : forces) {
+					if (connected(b, b.getStartingNode(), f)) {
+						free1 += f.calculateMoment(point);
+					} else {
+						free2 += f.calculateMoment(point);
+					}
+				}
+				matrix[numOfNodes + addIndex + 2][numOfReactions] = -free1;
+				matrix[numOfNodes + addIndex + 1 + 2][numOfReactions] = -free2;
+
+				addIndex += 2;
+			}
+			if (b.isEndingNodeReleased()) {
+				Point point = b.getEndingNode().getPoint();
+				for (int i = 0; i < numOfReactions; i++) {
+					Force f = reactions.get(i);
+					if (connected(b, b.getEndingNode(), f)) {
+						matrix[numOfNodes + addIndex + 2][i] = f.calculateMoment(point);
+					} else {
+						matrix[numOfNodes + addIndex + 1 + 2][i] = f.calculateMoment(point);
+					}
+				}
+				double free1 = 0;
+				double free2 = 0;
+				for (Force f : forces) {
+					if (connected(b, b.getEndingNode(), f)) {
+						free1 += f.calculateMoment(point);
+					} else {
+						free2 += f.calculateMoment(point);
+					}
+				}
+				matrix[numOfNodes + addIndex + 2][numOfReactions] = -free1;
+				matrix[numOfNodes + addIndex + 1 + 2][numOfReactions] = -free2;
+
+				addIndex += 2;
+			}
+		}
+
 		return matrix;
+	}
+
+	private boolean connected(Bar end, Node released, Force force) {
+		Point fPoint = force.getPoint();
+		Point node = released.getPoint();
+		List<Bar> checked = new ArrayList<Bar>();
+		if (!fPoint.equals(node)) {
+			Bar forceBar = null;
+			for (Bar b : bars) {
+				if (b.contains(fPoint)) {
+					if (b.equals(end)) {
+						return true;
+					}
+					forceBar = b;
+				}
+			}
+			checked.add(forceBar);
+			boolean result = checkBarConnection(forceBar, end, released, checked);
+			return result;
+		}
+		return false;
+	}
+
+	private boolean checkBarConnection(Bar start, Bar end, Node released, List<Bar> checked) {
+		Point connected = start.getCommonPoint(end);
+		if (connected != null && !connected.equals(released.getPoint())) {
+			return true;
+		}
+		for (Bar other : bars) {
+			if (!checked.contains(other)) {
+				Point common = start.getCommonPoint(other);
+				if (common != null && !common.equals(released.getPoint())) {
+					checked.add(other);
+					boolean condition = checkBarConnection(other, end, released, checked);
+					if (condition) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	private int getNumOfReleases() {
+		int result = 0;
+		for (Bar b : bars) {
+			if (b.isStartingNodeReleased())
+				result++;
+			if (b.isEndingNodeReleased())
+				result++;
+		}
+		return result;
 	}
 
 	private void addFoundationDisk() {

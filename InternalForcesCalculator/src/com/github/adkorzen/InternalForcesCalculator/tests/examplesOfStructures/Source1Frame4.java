@@ -46,7 +46,7 @@ public class Source1Frame4 {
 		double V2 = p.getNode(8, 0).getVerticalReaction();
 		
 		assertEquals(0, H1, Project.ACCURACY);
-		assertEquals(0.01, V1, Project.ACCURACY);
-		assertEquals(-0.01, V2, Project.ACCURACY);
+		assertEquals(0.0125, V1, Project.ACCURACY);
+		assertEquals(-0.0125, V2, Project.ACCURACY);
 	}
 }

@@ -47,8 +47,8 @@ public class Source3Beam1 {
 		double V2 = p.getNode(8, 3).getVerticalReaction();
 		
 		assertEquals(0, H1, Project.ACCURACY);
-		assertEquals(21.83, V1, Project.ACCURACY);
+		assertEquals(21.83333333, V1, Project.ACCURACY);
 		assertEquals(-43, M1, Project.ACCURACY);
-		assertEquals(24.67, V2, Project.ACCURACY);
+		assertEquals(24.66666667, V2, Project.ACCURACY);
 	}
 }

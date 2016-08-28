@@ -47,7 +47,7 @@ public class Source7Beam6 {
 		double M3 = p.getNode(11, 0).getMomentReaction();
 		
 		assertEquals(-7.5, V1, Project.ACCURACY);
-		assertEquals(-37.5, V2, Project.ACCURACY);
+		assertEquals(37.5, V2, Project.ACCURACY);
 		assertEquals(40, V3, Project.ACCURACY);
 		assertEquals(60, M3, Project.ACCURACY);
 	}
